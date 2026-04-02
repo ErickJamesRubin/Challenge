@@ -465,10 +465,11 @@ body::before {
 
 <script>
 // ============================================================
-// API CONFIGURATION
-// Change this if your XAMPP folder name is different
+// API CONFIGURATION — auto-detects your folder name
+// Works whether your folder is /ICS_Quiz/, /quiz_system/, etc.
 // ============================================================
-const API_BASE = 'http://localhost/quiz_system/api';
+const API_BASE = window.location.origin +
+  window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
 
 // ============================================================
 // QUESTION BANK — 20 Arduino Questions
