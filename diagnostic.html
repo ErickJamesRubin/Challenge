@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quiz System — Diagnostic</title>
+<style>
+  body { font-family: monospace; background: #0d1117; color: #c9d1d9; padding: 30px; font-size: 14px; }
+  h2   { color: #58a6ff; margin-bottom: 6px; }
+  .box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  .ok  { color: #3fb950; font-weight: bold; }
+  .err { color: #f85149; font-weight: bold; }
+  .info{ color: #e3b341; }
+  pre  { white-space: pre-wrap; word-break: break-all; margin: 6px 0 0; color: #8b949e; }
+  button { background: #238636; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: monospace; margin-right: 8px; }
+  button:hover { background: #2ea043; }
+</style>
+</head>
+<body>
+
+<h2>🔬 Quiz System — Diagnostic Tool</h2>
+<p style="color:#8b949e;margin-bottom:20px;">This page tests each component. Open it at: <span class="info">http://localhost/ICS_Quiz/diagnostic.html</span></p>
+
+<div class="box">
+  <h2>1. API Path Detection</h2>
+  <div id="path-result">Checking...</div>
+</div>
+
+<div class="box">
+  <h2>2. GET Leaderboard API</h2>
+  <button onclick="testGet()">Test GET</button>
+  <pre id="get-result">Click button to test</pre>
+</div>
+
+<div class="box">
+  <h2>3. POST Save Result API</h2>
+  <button onclick="testPost()">Test POST (sends dummy data)</button>
+  <pre id="post-result">Click button to test</pre>
+</div>
+
+<div class="box">
+  <h2>4. Raw PHP Test</h2>
+  <p style="color:#8b949e">Open these URLs directly in a new tab to see raw output:</p>
+  <div id="raw-links"></div>
+</div>
+
+<script>
+const API_BASE = window.location.origin +
+  window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+
+// Show detected path
+document.getElementById('path-result').innerHTML =
+  'Detected API_BASE: <span class="ok">' + API_BASE + '</span><br>' +
+  'GET URL will be: <span class="info">' + API_BASE + '/get_leaderboard.php</span><br>' +
+  'POST URL will be: <span class="info">' + API_BASE + '/save_result.php</span>';
+
+// Raw links
+document.getElementById('raw-links').innerHTML =
+  '<a href="' + API_BASE + '/get_leaderboard.php" target="_blank" style="color:#58a6ff">' + API_BASE + '/get_leaderboard.php</a><br><br>' +
+  '<a href="' + API_BASE + '/save_result.php" target="_blank" style="color:#58a6ff">' + API_BASE + '/save_result.php (GET will show method error — that\'s normal)</a>';
+
+async function testGet() {
+  const el = document.getElementById('get-result');
+  el.textContent = 'Fetching...';
+  try {
+    const res  = await fetch(API_BASE + '/get_leaderboard.php');
+    const text = await res.text();
+    el.innerHTML = '<span class="info">HTTP Status: ' + res.status + '</span>\n\nRaw response:\n' + escHtml(text);
+    try {
+      const json = JSON.parse(text);
+      el.innerHTML += '\n\n<span class="ok">✓ Valid JSON</span>\n' + JSON.stringify(json, null, 2);
+    } catch(e) {
+      el.innerHTML += '\n\n<span class="err">✗ NOT valid JSON — this is the problem!</span>';
+    }
+  } catch(e) {
+    el.innerHTML = '<span class="err">✗ Fetch failed: ' + escHtml(e.message) + '</span>\n\nThis usually means Apache is not running or the path is wrong.';
+  }
+}
+
+async function testPost() {
+  const el = document.getElementById('post-result');
+  el.textContent = 'Posting...';
+  try {
+    const res  = await fetch(API_BASE + '/save_result.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: 'TEST_USER', score: 3, time_taken: 99 })
+    });
+    const text = await res.text();
+    el.innerHTML = '<span class="info">HTTP Status: ' + res.status + '</span>\n\nRaw response:\n' + escHtml(text);
+    try {
+      const json = JSON.parse(text);
+      if (json.success) {
+        el.innerHTML += '\n\n<span class="ok">✓ SUCCESS — record saved! ID: ' + json.id + ', Rank: #' + json.rank + '</span>';
+      } else {
+        el.innerHTML += '\n\n<span class="err">✗ API returned error: ' + escHtml(json.error) + '</span>';
+      }
+    } catch(e) {
+      el.innerHTML += '\n\n<span class="err">✗ NOT valid JSON — PHP error shown above</span>';
+    }
+  } catch(e) {
+    el.innerHTML = '<span class="err">✗ Fetch failed: ' + escHtml(e.message) + '</span>';
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
