@@ -464,134 +464,40 @@ body::before {
 </div><!-- /wrap -->
 
 <script>
-// ============================================================
-// API CONFIGURATION — auto-detects your folder name
-// Works whether your folder is /ICS_Quiz/, /quiz_system/, etc.
-// ============================================================
-const API_BASE = window.location.origin +
-  window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+const API_BASE = 'http://localhost/ICS_Quiz/api';
 
-// ============================================================
-// QUESTION BANK — 20 Arduino Questions
-// ============================================================
 const QB = [
-  {
-    q: "What will be printed to the Serial Monitor when this code runs?",
-    code: `int x = 5;\nint y = 3;\nSerial.println(x + y);`,
-    choices: ["53","8","35","Error"], ans: 1
-  },
-  {
-    q: "How many times will this loop run?",
-    code: `for (int i = 0; i < 4; i++) {\n  Serial.println(i);\n}`,
-    choices: ["3","4","5","Infinite"], ans: 1
-  },
-  {
-    q: "What is the value of 'result' after this code executes?",
-    code: `int result = 0;\nfor (int i = 1; i <= 5; i++) {\n  result += i;\n}`,
-    choices: ["5","10","15","25"], ans: 2
-  },
-  {
-    q: "What will the LED do if this runs on pin 13?",
-    code: `digitalWrite(13, HIGH);\ndelay(500);\ndigitalWrite(13, LOW);\ndelay(500);`,
-    choices: ["Stay on forever","Blink once (on 0.5s, off 0.5s)","Stay off forever","Blink twice rapidly"], ans: 1
-  },
-  {
-    q: "What does analogRead() return for a fully pressed 5V signal on an Arduino Uno?",
-    code: `int val = analogRead(A0);\n// pin connected to 5V`,
-    choices: ["255","1023","100","5"], ans: 1
-  },
-  {
-    q: "What is the output of this code?",
-    code: `int a = 10;\nif (a > 5) {\n  Serial.println("Big");\n} else {\n  Serial.println("Small");\n}`,
-    choices: ["Small","Big","10","Nothing"], ans: 1
-  },
-  {
-    q: "What type should 'ledPin' be declared as here?",
-    code: `_____ ledPin = 13;\nvoid setup() {\n  pinMode(ledPin, OUTPUT);\n}`,
-    choices: ["float","String","int","bool"], ans: 2
-  },
-  {
-    q: "What will Serial.println(val) print?",
-    code: `int val = 7 % 3;`,
-    choices: ["7","3","2","1"], ans: 3
-  },
-  {
-    q: "What does this function return when called as add(3, 4)?",
-    code: `int add(int a, int b) {\n  return a * b;\n}`,
-    choices: ["7","12","34","1"], ans: 1
-  },
-  {
-    q: "What will this conditional print when sensorVal = 400?",
-    code: `int sensorVal = 400;\nif (sensorVal < 300) {\n  Serial.println("LOW");\n} else if (sensorVal < 600) {\n  Serial.println("MID");\n} else {\n  Serial.println("HIGH");\n}`,
-    choices: ["LOW","HIGH","MID","Nothing"], ans: 2
-  },
-  {
-    q: "What is the correct way to declare a constant pin number in Arduino?",
-    code: `// Pin 9 should never change`,
-    choices: ["int pin = 9;","const int pin = 9;","define pin 9;","static pin = 9;"], ans: 1
-  },
-  {
-    q: "How many times will 'Hello' print?",
-    code: `int count = 0;\nwhile (count < 3) {\n  Serial.println("Hello");\n  count++;\n}`,
-    choices: ["2","3","4","Infinite"], ans: 1
-  },
-  {
-    q: "What value will 'mapped' hold?",
-    code: `int raw = 512;\nint mapped = map(raw, 0, 1023, 0, 100);`,
-    choices: ["100","50","51","512"], ans: 1
-  },
-  {
-    q: "What is wrong with this digitalWrite call?",
-    code: `pinMode(8, INPUT);\ndigitalWrite(8, HIGH);`,
-    choices: ["Pin number must be >= 10","Pin mode should be OUTPUT to drive it HIGH","HIGH should be written as 1","Nothing, it is correct"], ans: 1
-  },
-  {
-    q: "What does this array access return?",
-    code: `int temps[] = {22, 25, 19, 30};\nSerial.println(temps[2]);`,
-    choices: ["25","19","22","30"], ans: 1
-  },
-  {
-    q: "What will the Serial Monitor show?",
-    code: `bool flag = false;\nflag = !flag;\nSerial.println(flag);`,
-    choices: ["false","0","true","1"], ans: 3
-  },
-  {
-    q: "What does millis() return in Arduino?",
-    code: `unsigned long t = millis();`,
-    choices: ["Current time in seconds since upload","Milliseconds since the program started","System clock in microseconds","Time since last reset in minutes"], ans: 1
-  },
-  {
-    q: "What happens if delay() is inside loop() with value 1000?",
-    code: `void loop() {\n  Serial.println("Tick");\n  delay(1000);\n}`,
-    choices: ["Prints 'Tick' once, then stops","Prints 'Tick' every ~1 second indefinitely","Prints 'Tick' 1000 times then stops","Causes a compile error"], ans: 1
-  },
-  {
-    q: "What does this analogWrite call do to an LED on pin 6?",
-    code: `analogWrite(6, 128);`,
-    choices: ["Turns LED fully ON","Turns LED fully OFF","Sets LED to approximately 50% brightness via PWM","Flashes LED 128 times"], ans: 2
-  },
-  {
-    q: "What is the final value of 'counter'?",
-    code: `int counter = 10;\ncounter -= 3;\ncounter *= 2;\nSerial.println(counter);`,
-    choices: ["14","7","20","4"], ans: 0
-  }
+  { q: "What will be printed to the Serial Monitor when this code runs?", code: `int x = 5;\nint y = 3;\nSerial.println(x + y);`, choices: ["53","8","35","Error"], ans: 1 },
+  { q: "How many times will this loop run?", code: `for (int i = 0; i < 4; i++) {\n  Serial.println(i);\n}`, choices: ["3","4","5","Infinite"], ans: 1 },
+  { q: "What is the value of 'result' after this code executes?", code: `int result = 0;\nfor (int i = 1; i <= 5; i++) {\n  result += i;\n}`, choices: ["5","10","15","25"], ans: 2 },
+  { q: "What will the LED do if this runs on pin 13?", code: `digitalWrite(13, HIGH);\ndelay(500);\ndigitalWrite(13, LOW);\ndelay(500);`, choices: ["Stay on forever","Blink once (on 0.5s, off 0.5s)","Stay off forever","Blink twice rapidly"], ans: 1 },
+  { q: "What does analogRead() return for a fully pressed 5V signal on an Arduino Uno?", code: `int val = analogRead(A0);\n// pin connected to 5V`, choices: ["255","1023","100","5"], ans: 1 },
+  { q: "What is the output of this code?", code: `int a = 10;\nif (a > 5) {\n  Serial.println("Big");\n} else {\n  Serial.println("Small");\n}`, choices: ["Small","Big","10","Nothing"], ans: 1 },
+  { q: "What type should 'ledPin' be declared as here?", code: `_____ ledPin = 13;\nvoid setup() {\n  pinMode(ledPin, OUTPUT);\n}`, choices: ["float","String","int","bool"], ans: 2 },
+  { q: "What will Serial.println(val) print?", code: `int val = 7 % 3;`, choices: ["7","3","2","1"], ans: 3 },
+  { q: "What does this function return when called as add(3, 4)?", code: `int add(int a, int b) {\n  return a * b;\n}`, choices: ["7","12","34","1"], ans: 1 },
+  { q: "What will this conditional print when sensorVal = 400?", code: `int sensorVal = 400;\nif (sensorVal < 300) {\n  Serial.println("LOW");\n} else if (sensorVal < 600) {\n  Serial.println("MID");\n} else {\n  Serial.println("HIGH");\n}`, choices: ["LOW","HIGH","MID","Nothing"], ans: 2 },
+  { q: "What is the correct way to declare a constant pin number in Arduino?", code: `// Pin 9 should never change`, choices: ["int pin = 9;","const int pin = 9;","define pin 9;","static pin = 9;"], ans: 1 },
+  { q: "How many times will 'Hello' print?", code: `int count = 0;\nwhile (count < 3) {\n  Serial.println("Hello");\n  count++;\n}`, choices: ["2","3","4","Infinite"], ans: 1 },
+  { q: "What value will 'mapped' hold?", code: `int raw = 512;\nint mapped = map(raw, 0, 1023, 0, 100);`, choices: ["100","50","51","512"], ans: 1 },
+  { q: "What is wrong with this digitalWrite call?", code: `pinMode(8, INPUT);\ndigitalWrite(8, HIGH);`, choices: ["Pin number must be >= 10","Pin mode should be OUTPUT to drive it HIGH","HIGH should be written as 1","Nothing, it is correct"], ans: 1 },
+  { q: "What does this array access return?", code: `int temps[] = {22, 25, 19, 30};\nSerial.println(temps[2]);`, choices: ["25","19","22","30"], ans: 1 },
+  { q: "What will the Serial Monitor show?", code: `bool flag = false;\nflag = !flag;\nSerial.println(flag);`, choices: ["false","0","true","1"], ans: 3 },
+  { q: "What does millis() return in Arduino?", code: `unsigned long t = millis();`, choices: ["Current time in seconds since upload","Milliseconds since the program started","System clock in microseconds","Time since last reset in minutes"], ans: 1 },
+  { q: "What happens if delay() is inside loop() with value 1000?", code: `void loop() {\n  Serial.println("Tick");\n  delay(1000);\n}`, choices: ["Prints 'Tick' once, then stops","Prints 'Tick' every ~1 second indefinitely","Prints 'Tick' 1000 times then stops","Causes a compile error"], ans: 1 },
+  { q: "What does this analogWrite call do to an LED on pin 6?", code: `analogWrite(6, 128);`, choices: ["Turns LED fully ON","Turns LED fully OFF","Sets LED to approximately 50% brightness via PWM","Flashes LED 128 times"], ans: 2 },
+  { q: "What is the final value of 'counter'?", code: `int counter = 10;\ncounter -= 3;\ncounter *= 2;\nSerial.println(counter);`, choices: ["14","7","20","4"], ans: 0 }
 ];
 
 const KEYS = ['A','B','C','D'];
 
-// ============================================================
-// STATE
-// ============================================================
 let S = {
   nickname:'', selected:[], current:0,
-  score:0, answered:false,
+  score:0, answered:false, pendingAnswer:undefined,
   stopwatchInterval:null, elapsedSeconds:0,
   dbConnected: false
 };
 
-// ============================================================
-// DATABASE STATUS CHECK
-// ============================================================
 async function checkDbStatus() {
   const el    = document.getElementById('db-status');
   const label = document.getElementById('db-status-text');
@@ -599,22 +505,17 @@ async function checkDbStatus() {
     const res  = await fetch(`${API_BASE}/get_leaderboard.php`, { signal: AbortSignal.timeout(4000) });
     const data = await res.json();
     if (data.success) {
-      el.className    = 'db-status ok';
+      el.className      = 'db-status ok';
       label.textContent = `MySQL connected · ${data.total} record${data.total !== 1 ? 's' : ''} stored`;
-      S.dbConnected   = true;
-    } else {
-      throw new Error(data.error || 'Unknown error');
-    }
+      S.dbConnected     = true;
+    } else { throw new Error(data.error || 'Unknown error'); }
   } catch (e) {
-    el.className    = 'db-status err';
+    el.className      = 'db-status err';
     label.textContent = 'Database offline — check XAMPP';
-    S.dbConnected   = false;
+    S.dbConnected     = false;
   }
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -622,9 +523,6 @@ function goTo(id) {
   if (id === 'screen-quiz') loadAndRenderLB();
 }
 
-// ============================================================
-// LOGIN
-// ============================================================
 function startQuiz() {
   const nick = document.getElementById('nickname-input').value.trim();
   const err  = document.getElementById('login-error');
@@ -650,22 +548,13 @@ function initQuiz() {
 
 function retakeQuiz() { goTo('screen-login'); }
 
-// ============================================================
-// STOPWATCH
-// ============================================================
 function startStopwatch() {
   S.elapsedSeconds = 0;
   updateStopwatchDisplay();
   if (S.stopwatchInterval) clearInterval(S.stopwatchInterval);
-  S.stopwatchInterval = setInterval(() => {
-    S.elapsedSeconds++;
-    updateStopwatchDisplay();
-  }, 1000);
+  S.stopwatchInterval = setInterval(() => { S.elapsedSeconds++; updateStopwatchDisplay(); }, 1000);
 }
-function stopStopwatch() {
-  clearInterval(S.stopwatchInterval);
-  S.stopwatchInterval = null;
-}
+function stopStopwatch() { clearInterval(S.stopwatchInterval); S.stopwatchInterval = null; }
 function updateStopwatchDisplay() {
   const m = Math.floor(S.elapsedSeconds / 60);
   const s = S.elapsedSeconds % 60;
@@ -673,13 +562,11 @@ function updateStopwatchDisplay() {
     String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
-// ============================================================
-// QUESTION RENDER
-// ============================================================
 function renderQuestion() {
   const qi = S.selected[S.current];
   const q  = QB[qi];
-  S.answered = false;
+  S.answered      = false;
+  S.pendingAnswer = undefined;  // ← reset pending answer each question
 
   document.getElementById('q-nickname').textContent = S.nickname;
   document.getElementById('q-score').textContent    = S.score;
@@ -710,33 +597,33 @@ function renderQuestion() {
     S.current < 4 ? 'Next Question →' : 'View Results →';
 }
 
-// ============================================================
-// ANSWER — no correct/wrong reveal
-// ============================================================
+// ── ANSWER: allows reselection until Next is clicked ──
 function selectAnswer(idx, btnEl) {
   if (S.answered) return;
-  S.answered = true;
-  document.querySelectorAll('.choice').forEach(b => b.disabled = true);
+  // Deselect all, then select clicked
+  document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
   btnEl.classList.add('selected');
-  if (idx === QB[S.selected[S.current]].ans) S.score++;
-  document.getElementById('q-score').textContent = S.score;
+  S.pendingAnswer = idx;
+  // Show next button but don't lock in yet
   document.getElementById('next-wrap').style.display = 'block';
 }
 
 function nextQuestion() {
+  // Lock in the answer when Next is clicked
+  if (!S.answered && S.pendingAnswer !== undefined) {
+    S.answered = true;
+    document.querySelectorAll('.choice').forEach(b => b.disabled = true);
+    if (S.pendingAnswer === QB[S.selected[S.current]].ans) S.score++;
+    document.getElementById('q-score').textContent = S.score;
+  }
   S.current++;
   if (S.current >= 5) finishQuiz();
   else renderQuestion();
 }
 
-// ============================================================
-// FINISH — save to MySQL then show results
-// ============================================================
 async function finishQuiz() {
   stopStopwatch();
   const totalSec = S.elapsedSeconds;
-
-  // Show saving overlay
   document.getElementById('saving-overlay').classList.add('show');
 
   let rank = null;
@@ -746,47 +633,28 @@ async function finishQuiz() {
     const res = await fetch(`${API_BASE}/save_result.php`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nickname:   S.nickname,
-        score:      S.score,
-        time_taken: totalSec
-      }),
+      body: JSON.stringify({ nickname: S.nickname, score: S.score, time_taken: totalSec }),
       signal: AbortSignal.timeout(6000)
     });
     const data = await res.json();
-    if (data.success) {
-      rank      = data.rank;
-      savedToDb = true;
-    }
-  } catch (e) {
-    console.error('Save failed:', e);
-    // Quiz still works — just won't show DB-saved badge
-  }
+    if (data.success) { rank = data.rank; savedToDb = true; }
+  } catch (e) { console.error('Save failed:', e); }
 
-  // Hide overlay
   document.getElementById('saving-overlay').classList.remove('show');
 
-  // Show results
   const grades = ['Critical Fail','Needs Improvement','Average','Good','Excellent','Perfect Score'];
   document.getElementById('res-score').textContent   = `${S.score}/5`;
   document.getElementById('res-grade').textContent   = `GRADE: ${grades[S.score]}`;
   document.getElementById('res-correct').textContent = S.score;
   document.getElementById('res-wrong').textContent   = 5 - S.score;
   document.getElementById('res-time').textContent    = fmtTime(totalSec);
-  document.getElementById('res-rank').textContent    = rank && rank <= 10 ? `#${rank}` : rank ? `#${rank}` : '—';
+  document.getElementById('res-rank').textContent    = rank ? `#${rank}` : '—';
 
-  const badge = document.getElementById('db-saved-badge');
-  badge.style.display = savedToDb ? 'flex' : 'none';
-
+  document.getElementById('db-saved-badge').style.display = savedToDb ? 'flex' : 'none';
   goTo('screen-results');
-
-  // Refresh db status pill
   checkDbStatus();
 }
 
-// ============================================================
-// LEADERBOARD — fetched from MySQL
-// ============================================================
 async function loadAndRenderLB() {
   const statusEl = document.getElementById('lb-status');
   const bodyEl   = document.getElementById('lb-body');
@@ -797,11 +665,8 @@ async function loadAndRenderLB() {
   totalEl.textContent  = '';
 
   try {
-    const res  = await fetch(`${API_BASE}/get_leaderboard.php?limit=10`, {
-      signal: AbortSignal.timeout(5000)
-    });
+    const res  = await fetch(`${API_BASE}/get_leaderboard.php?limit=10`, { signal: AbortSignal.timeout(5000) });
     const data = await res.json();
-
     if (!data.success) throw new Error(data.error);
 
     statusEl.textContent = `MySQL · Updated just now`;
@@ -818,7 +683,6 @@ async function loadAndRenderLB() {
       const barW     = Math.round((e.score / 5) * 100);
       const rankCls  = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
       const rankLabel = i < 3 ? medals[i] : e.rank;
-      // Format date nicely
       const d = new Date(e.date_taken);
       const dateStr = isNaN(d) ? e.date_taken : d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
       return `<div class="lb-entry">
@@ -838,9 +702,6 @@ async function loadAndRenderLB() {
   }
 }
 
-// ============================================================
-// SYNTAX HIGHLIGHT
-// ============================================================
 function syntaxHL(code) {
   const kwRe = /\b(int|float|bool|char|void|const|return|if|else|while|for|true|false|unsigned|long|String|static)\b/g;
   const fnRe = /\b(digitalWrite|digitalRead|analogRead|analogWrite|pinMode|Serial|delay|millis|map|random|randomSeed|toupper|strlen|println|begin)\b/g;
@@ -864,7 +725,6 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ── Init ──────────────────────────────────────────────────────
 checkDbStatus();
 </script>
 </body>
