@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino Quiz — BSIT Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f4f6f0;
+  --bg2:      #ffffff;
+  --bg3:      #eef1e8;
+  --ink:      #1a2214;
+  --ink2:     #3d4f35;
+  --ink3:     #7a8c6e;
+  --accent:   #3a7d44;
+  --accent2:  #2d6136;
+  --accent-l: #e8f4ea;
+  --accent-xl:#f0f9f1;
+  --red:      #c0392b;
+  --red-l:    #fdecea;
+  --amber:    #d97706;
+  --gold:     #b7862c;
+  --silver:   #7a8896;
+  --bronze:   #8b5e3c;
+  --border:   #d4dbc8;
+  --code-bg:  #1e2a1a;
+  --code-fg:  #c8e6b0;
+  --shadow:   0 2px 12px rgba(30,50,20,0.08);
+  --shadow2:  0 4px 24px rgba(30,50,20,0.13);
+  --radius:   12px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  font-size: 17px;
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(58,125,68,0.06) 0%, transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(58,125,68,0.05) 0%, transparent 50%);
+}
+body::before {
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.35;
+  pointer-events:none;
+  z-index:0;
+}
+
+.wrap {
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding: 28px 20px 60px;
+}
+
+/* ─── HEADER ─── */
+.site-header { text-align:center; margin-bottom:32px; width:100%; }
+.site-badge {
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;font-weight:700;letter-spacing:3px;
+  padding:6px 16px;border-radius:20px;margin-bottom:12px;
+}
+.site-badge svg{fill:none;stroke:#fff;stroke-width:2;flex-shrink:0;}
+.site-title {
+  font-family:'Space Mono',monospace;
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  font-weight:700;color:var(--ink);letter-spacing:-1px;line-height:1.1;
+}
+.site-title span{color:var(--accent);}
+.site-sub { font-size:0.9rem;color:var(--ink3);margin-top:8px;letter-spacing:1px; }
+.site-divider { width:64px;height:3px;background:var(--accent);border-radius:2px;margin:14px auto 0; }
+
+/* ─── DB STATUS PILL ─── */
+.db-status {
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;font-size:0.62rem;
+  padding:4px 12px;border-radius:20px;margin-top:10px;
+  border:1px solid var(--border);background:var(--bg2);
+  transition:all 0.3s;
+}
+.db-status .dot {
+  width:7px;height:7px;border-radius:50%;
+  background:#aaa;flex-shrink:0;
+  transition:background 0.3s;
+}
+.db-status.ok   { border-color:rgba(58,125,68,0.3);color:var(--accent); }
+.db-status.ok .dot  { background:var(--accent); box-shadow:0 0 0 2px rgba(58,125,68,0.2); }
+.db-status.err  { border-color:rgba(192,57,43,0.3);color:var(--red); }
+.db-status.err .dot { background:var(--red); }
+
+/* ─── SCREENS ─── */
+.screen{display:none;width:100%;max-width:1200px;}
+.screen.active{display:block;}
+
+/* ─── CARD ─── */
+.card { background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;box-shadow:var(--shadow); }
+.card-sm{padding:24px 28px;}
+
+/* ─── LABEL ─── */
+.label {
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:700;
+  letter-spacing:3px;color:var(--ink3);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.label::before{ content:'';display:inline-block;width:12px;height:2px;background:var(--accent);border-radius:1px; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--accent);color:#fff;
+  font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;letter-spacing:1px;
+  padding:15px 28px;border:none;border-radius:8px;
+  cursor:pointer;transition:all 0.18s;text-transform:uppercase;width:100%;
+}
+.btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:var(--shadow2);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.btn-outline{ background:transparent;color:var(--accent);border:1.5px solid var(--accent); }
+.btn-outline:hover{background:var(--accent-xl);transform:translateY(-1px);}
+.btn-sm{padding:9px 18px;font-size:0.72rem;width:auto;}
+.btn-group{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-group .btn{flex:1;min-width:140px;}
+
+/* ─── INPUT ─── */
+.input-wrap{margin-bottom:22px;}
+.input-wrap label{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;
+  letter-spacing:2px;color:var(--ink3);margin-bottom:9px;text-transform:uppercase;
+}
+.input-wrap input {
+  width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--ink);
+  font-family:'JetBrains Mono',monospace;font-size:1.15rem;padding:14px 18px;border-radius:8px;
+  outline:none;transition:border-color 0.18s,box-shadow 0.18s;
+}
+.input-wrap input:focus{ border-color:var(--accent);box-shadow:0 0 0 3px rgba(58,125,68,0.12); }
+.input-wrap input::placeholder{color:var(--ink3);}
+.input-err{color:var(--red);font-size:0.78rem;margin-bottom:12px;font-family:'JetBrains Mono',monospace;min-height:20px;}
+
+/* ─── SPLASH ─── */
+#screen-splash{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;}
+#screen-splash.active{display:flex;}
+.splash-info{ display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 28px;justify-content:center; }
+.splash-chip{
+  background:var(--accent-l);color:var(--accent);border:1px solid rgba(58,125,68,0.25);
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;
+  padding:6px 14px;border-radius:20px;
+}
+.splash-ascii{
+  font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--ink3);
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px 28px;line-height:2;margin-bottom:28px;width:100%;max-width:460px;
+}
+.splash-ascii .kw{color:var(--accent);font-weight:700;}
+.splash-ascii .cm{color:var(--ink3);}
+.splash-ascii .num{color:var(--amber);}
+
+/* ─── QUIZ LAYOUT ─── */
+.quiz-layout{ display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start; }
+@media(max-width:900px){.quiz-layout{grid-template-columns:1fr;}}
+
+/* ─── QUIZ TOP ─── */
+.quiz-top{ display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px; }
+.quiz-who{ font-family:'JetBrains Mono',monospace;font-size:0.85rem; }
+.quiz-who span{color:var(--accent);font-weight:700;}
+.score-badge{
+  background:var(--accent-l);color:var(--accent);
+  font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;
+  padding:6px 16px;border-radius:20px;border:1px solid rgba(58,125,68,0.2);
+}
+
+/* ─── STOPWATCH ─── */
+.stopwatch-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:8px 18px;
+}
+.stopwatch-icon{width:20px;height:20px;color:var(--ink3);flex-shrink:0;}
+.stopwatch-label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--ink3);letter-spacing:2px;display:block;}
+.stopwatch-time{font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--ink);line-height:1;}
+
+/* ─── PROGRESS ─── */
+.progress-row{ display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--ink3);margin-bottom:8px; }
+.progress-track{ height:6px;background:var(--border);border-radius:3px;margin-bottom:26px;overflow:hidden; }
+.progress-bar{ height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s ease; }
+
+/* ─── QUESTION ─── */
+.q-num{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--ink3);letter-spacing:2px;margin-bottom:10px;}
+.q-text{font-size:1.15rem;line-height:1.7;color:var(--ink);margin-bottom:20px;font-weight:500;}
+.code-snippet{
+  background:var(--code-bg);border-radius:10px;padding:18px 22px;
+  font-family:'JetBrains Mono',monospace;font-size:0.88rem;line-height:2;color:var(--code-fg);
+  margin-bottom:22px;border-left:3px solid var(--accent);overflow-x:auto;white-space:pre;
+}
+.code-snippet .kw{color:#7ec8e3;}
+.code-snippet .fn{color:#f7c6f7;}
+.code-snippet .cm{color:#6a8c5a;}
+.code-snippet .num{color:#f0b97a;}
+
+/* ─── CHOICES ─── */
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice{
+  background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;
+  padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:14px;
+  transition:all 0.18s;font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--ink);
+  text-align:left;width:100%;
+}
+.choice:hover:not(:disabled){ border-color:var(--accent);background:var(--accent-xl);transform:translateX(4px);box-shadow:var(--shadow); }
+.choice:active:not(:disabled){transform:translateX(2px);}
+.choice-key{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;flex-shrink:0;background:var(--border);border-radius:6px;
+  font-weight:700;font-size:0.8rem;color:var(--ink3);transition:all 0.18s;
+}
+.choice:hover:not(:disabled) .choice-key{background:var(--accent);color:#fff;}
+.choice.selected{border-color:var(--accent);background:var(--accent-l);}
+.choice.selected .choice-key{background:var(--accent);color:#fff;}
+.choice:disabled{cursor:not-allowed;opacity:0.7;}
+.next-wrap{margin-top:20px;text-align:center;}
+
+/* ─── LEADERBOARD PANEL ─── */
+.lb-panel .label{margin-bottom:12px;}
+.lb-status{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--ink3);margin-bottom:10px;}
+.lb-entry{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:8px;
+  margin-bottom:7px;transition:background 0.15s;border:1px solid transparent;
+}
+.lb-entry:hover{background:var(--bg3);border-color:var(--border);}
+.lb-rank{ font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem;width:30px;text-align:center;flex-shrink:0; }
+.lb-rank.r1{color:var(--gold);}
+.lb-rank.r2{color:var(--silver);}
+.lb-rank.r3{color:var(--bronze);}
+.lb-rank.rn{font-size:0.8rem;color:var(--ink3);}
+.lb-info{flex:1;min-width:0;}
+.lb-name{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-time{font-size:0.68rem;color:var(--ink3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.lb-score{font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.lb-bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-top:5px;}
+.lb-bar{height:100%;background:var(--accent);border-radius:2px;transition:width 0.6s ease;}
+.lb-empty{
+  text-align:center;padding:32px 10px;color:var(--ink3);font-size:0.82rem;
+  font-family:'JetBrains Mono',monospace;border:1.5px dashed var(--border);border-radius:10px;line-height:2.2;
+}
+.lb-total{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--ink3);margin-top:12px;text-align:right;}
+
+/* ─── SAVING OVERLAY ─── */
+.saving-overlay{
+  display:none;position:fixed;inset:0;z-index:100;
+  background:rgba(244,246,240,0.85);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;
+}
+.saving-overlay.show{display:flex;}
+.saving-spinner{
+  width:40px;height:40px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.saving-text{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--ink3);}
+
+/* ─── RESULTS ─── */
+.result-hero{text-align:center;margin-bottom:28px;}
+.result-score{font-family:'Space Mono',monospace;font-size:5rem;font-weight:700;color:var(--accent);line-height:1;}
+.result-grade{font-family:'JetBrains Mono',monospace;font-size:0.85rem;letter-spacing:3px;color:var(--ink3);margin-top:8px;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:24px 0;}
+@media(max-width:520px){.result-grid{grid-template-columns:1fr 1fr;}}
+.result-stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center;}
+.result-stat .val{font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--accent);}
+.result-stat .lbl{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:2px;color:var(--ink3);margin-top:4px;}
+.db-saved-badge{
+  display:flex;align-items:center;gap:8px;justify-content:center;
+  background:var(--accent-l);border:1px solid rgba(58,125,68,0.25);
+  border-radius:8px;padding:10px 16px;margin-bottom:18px;
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent);
+}
+.db-saved-badge svg{flex-shrink:0;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp 0.35s ease both;}
+
+@media(max-width:640px){
+  .card{padding:22px 18px;}
+  .card-sm{padding:18px 16px;}
+  .quiz-top{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay" id="saving-overlay">
+  <div class="saving-spinner"></div>
+  <div class="saving-text">Saving to database...</div>
+</div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="site-header">
+    <div class="site-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      BSIT · ARDUINO CHALLENGE
+    </div>
+    <div class="site-title">Code<span>&lt;Quiz/&gt;</span></div>
+    <div class="site-sub">Arduino IDE · Medium Difficulty · 5 Random Questions</div>
+    <div class="site-divider"></div>
+    <div class="db-status" id="db-status">
+      <span class="dot"></span>
+      <span id="db-status-text">Checking database...</span>
+    </div>
+  </div>
+
+  <!-- ═══ SPLASH ═══ -->
+  <div class="screen active" id="screen-splash">
+    <div class="splash-ascii">
+<span class="cm">// Arduino Quiz Engine v3.0 + MySQL</span>
+<span class="kw">void</span> <span style="color:#3a7d44">setup</span>() {
+  db.connect(<span style="color:#f4d67a">"bsit_quiz"</span>);
+  quiz.load(<span class="num">20</span>); <span class="cm">// questions</span>
+  quiz.pick(<span class="num">5</span>);  <span class="cm">// random</span>
+}
+<span class="kw">void</span> <span style="color:#3a7d44">loop</span>() {
+  <span class="kw">if</span> (student.ready()) {
+    quiz.start(); <span class="cm">// records saved</span>
+  }
+}
+    </div>
+    <div class="splash-info">
+      <div class="splash-chip">20 Questions</div>
+      <div class="splash-chip">5 Per Attempt</div>
+      <div class="splash-chip">Timed Overall</div>
+      <div class="splash-chip">MySQL Database</div>
+    </div>
+    <div style="width:100%;max-width:420px;">
+      <button class="btn" onclick="goTo('screen-login')">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- ═══ LOGIN ═══ -->
+  <div class="screen" id="screen-login">
+    <div style="max-width:460px;margin:0 auto;width:100%;">
+      <div class="card fade-up">
+        <div class="label">Identification</div>
+        <div class="input-wrap">
+          <label>Your Nickname / Callsign</label>
+          <input type="text" id="nickname-input" maxlength="20" placeholder="e.g. ALPHA_01" autocomplete="off"
+                 onkeydown="if(event.key==='Enter')startQuiz()">
+        </div>
+        <div class="input-err" id="login-error"></div>
+        <div class="btn-group">
+          <button class="btn" onclick="startQuiz()">Initialize Quiz</button>
+          <button class="btn btn-outline btn-sm" onclick="goTo('screen-splash')" style="flex:0.4;">← Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ QUIZ ═══ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-layout">
+
+      <!-- LEFT: Quiz Panel -->
+      <div class="card fade-up" id="quiz-card">
+        <div class="quiz-top">
+          <div>
+            <div class="quiz-who">Pilot: <span id="q-nickname">—</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="score-badge">Score: <span id="q-score">0</span>/5</div>
+            <div class="stopwatch-box">
+              <svg class="stopwatch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/><path d="M12 2v3"/>
+              </svg>
+              <div>
+                <span class="stopwatch-label">ELAPSED</span>
+                <div class="stopwatch-time" id="stopwatch-display">00:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-row">
+          <span id="progress-label">Question 1 of 5</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+
+        <div class="q-num" id="q-num">Q.001</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="code-snippet" id="q-code" style="display:none;"></div>
+        <div class="choices" id="choices-wrap"></div>
+        <div class="next-wrap" id="next-wrap" style="display:none;">
+          <button class="btn" onclick="nextQuestion()" style="max-width:260px;" id="next-btn">Next Question →</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Leaderboard -->
+      <div class="card card-sm lb-panel" id="lb-panel">
+        <div class="label">Live Leaderboard</div>
+        <div class="lb-status" id="lb-status">Loading from database...</div>
+        <div id="lb-body">
+          <div class="lb-empty">Loading...</div>
+        </div>
+        <div class="lb-total" id="lb-total"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ RESULTS ═══ -->
+  <div class="screen" id="screen-results">
+    <div style="max-width:600px;margin:0 auto;width:100%;">
+      <div class="card fade-up">
+        <div class="label">Session Report</div>
+        <div class="db-saved-badge" id="db-saved-badge" style="display:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Result permanently saved to MySQL database
+        </div>
+        <div class="result-hero">
+          <div class="result-score" id="res-score">0/5</div>
+          <div class="result-grade" id="res-grade">GRADE: —</div>
+        </div>
+        <div class="result-grid">
+          <div class="result-stat">
+            <div class="val" id="res-correct">0</div>
+            <div class="lbl">Correct</div>
+          </div>
+          <div class="result-stat">
+            <div class="val" id="res-wrong">0</div>
+            <div class="lbl">Wrong</div>
+          </div>
+          <div class="result-stat">
+            <div class="val" id="res-time">0:00</div>
+            <div class="lbl">Total Time</div>
+          </div>
+          <div class="result-stat">
+            <div class="val" id="res-rank">—</div>
+            <div class="lbl">Rank</div>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="retakeQuiz()">Retake Quiz</button>
+          <button class="btn btn-outline" onclick="goTo('screen-splash')">Main Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ============================================================
+// API CONFIGURATION
+// Change this if your XAMPP folder name is different
+// ============================================================
+const API_BASE = 'http://localhost/quiz_system/api';
+
+// ============================================================
+// QUESTION BANK — 20 Arduino Questions
+// ============================================================
+const QB = [
+  {
+    q: "What will be printed to the Serial Monitor when this code runs?",
+    code: `int x = 5;\nint y = 3;\nSerial.println(x + y);`,
+    choices: ["53","8","35","Error"], ans: 1
+  },
+  {
+    q: "How many times will this loop run?",
+    code: `for (int i = 0; i < 4; i++) {\n  Serial.println(i);\n}`,
+    choices: ["3","4","5","Infinite"], ans: 1
+  },
+  {
+    q: "What is the value of 'result' after this code executes?",
+    code: `int result = 0;\nfor (int i = 1; i <= 5; i++) {\n  result += i;\n}`,
+    choices: ["5","10","15","25"], ans: 2
+  },
+  {
+    q: "What will the LED do if this runs on pin 13?",
+    code: `digitalWrite(13, HIGH);\ndelay(500);\ndigitalWrite(13, LOW);\ndelay(500);`,
+    choices: ["Stay on forever","Blink once (on 0.5s, off 0.5s)","Stay off forever","Blink twice rapidly"], ans: 1
+  },
+  {
+    q: "What does analogRead() return for a fully pressed 5V signal on an Arduino Uno?",
+    code: `int val = analogRead(A0);\n// pin connected to 5V`,
+    choices: ["255","1023","100","5"], ans: 1
+  },
+  {
+    q: "What is the output of this code?",
+    code: `int a = 10;\nif (a > 5) {\n  Serial.println("Big");\n} else {\n  Serial.println("Small");\n}`,
+    choices: ["Small","Big","10","Nothing"], ans: 1
+  },
+  {
+    q: "What type should 'ledPin' be declared as here?",
+    code: `_____ ledPin = 13;\nvoid setup() {\n  pinMode(ledPin, OUTPUT);\n}`,
+    choices: ["float","String","int","bool"], ans: 2
+  },
+  {
+    q: "What will Serial.println(val) print?",
+    code: `int val = 7 % 3;`,
+    choices: ["7","3","2","1"], ans: 3
+  },
+  {
+    q: "What does this function return when called as add(3, 4)?",
+    code: `int add(int a, int b) {\n  return a * b;\n}`,
+    choices: ["7","12","34","1"], ans: 1
+  },
+  {
+    q: "What will this conditional print when sensorVal = 400?",
+    code: `int sensorVal = 400;\nif (sensorVal < 300) {\n  Serial.println("LOW");\n} else if (sensorVal < 600) {\n  Serial.println("MID");\n} else {\n  Serial.println("HIGH");\n}`,
+    choices: ["LOW","HIGH","MID","Nothing"], ans: 2
+  },
+  {
+    q: "What is the correct way to declare a constant pin number in Arduino?",
+    code: `// Pin 9 should never change`,
+    choices: ["int pin = 9;","const int pin = 9;","define pin 9;","static pin = 9;"], ans: 1
+  },
+  {
+    q: "How many times will 'Hello' print?",
+    code: `int count = 0;\nwhile (count < 3) {\n  Serial.println("Hello");\n  count++;\n}`,
+    choices: ["2","3","4","Infinite"], ans: 1
+  },
+  {
+    q: "What value will 'mapped' hold?",
+    code: `int raw = 512;\nint mapped = map(raw, 0, 1023, 0, 100);`,
+    choices: ["100","50","51","512"], ans: 1
+  },
+  {
+    q: "What is wrong with this digitalWrite call?",
+    code: `pinMode(8, INPUT);\ndigitalWrite(8, HIGH);`,
+    choices: ["Pin number must be >= 10","Pin mode should be OUTPUT to drive it HIGH","HIGH should be written as 1","Nothing, it is correct"], ans: 1
+  },
+  {
+    q: "What does this array access return?",
+    code: `int temps[] = {22, 25, 19, 30};\nSerial.println(temps[2]);`,
+    choices: ["25","19","22","30"], ans: 1
+  },
+  {
+    q: "What will the Serial Monitor show?",
+    code: `bool flag = false;\nflag = !flag;\nSerial.println(flag);`,
+    choices: ["false","0","true","1"], ans: 3
+  },
+  {
+    q: "What does millis() return in Arduino?",
+    code: `unsigned long t = millis();`,
+    choices: ["Current time in seconds since upload","Milliseconds since the program started","System clock in microseconds","Time since last reset in minutes"], ans: 1
+  },
+  {
+    q: "What happens if delay() is inside loop() with value 1000?",
+    code: `void loop() {\n  Serial.println("Tick");\n  delay(1000);\n}`,
+    choices: ["Prints 'Tick' once, then stops","Prints 'Tick' every ~1 second indefinitely","Prints 'Tick' 1000 times then stops","Causes a compile error"], ans: 1
+  },
+  {
+    q: "What does this analogWrite call do to an LED on pin 6?",
+    code: `analogWrite(6, 128);`,
+    choices: ["Turns LED fully ON","Turns LED fully OFF","Sets LED to approximately 50% brightness via PWM","Flashes LED 128 times"], ans: 2
+  },
+  {
+    q: "What is the final value of 'counter'?",
+    code: `int counter = 10;\ncounter -= 3;\ncounter *= 2;\nSerial.println(counter);`,
+    choices: ["14","7","20","4"], ans: 0
+  }
+];
+
+const KEYS = ['A','B','C','D'];
+
+// ============================================================
+// STATE
+// ============================================================
+let S = {
+  nickname:'', selected:[], current:0,
+  score:0, answered:false,
+  stopwatchInterval:null, elapsedSeconds:0,
+  dbConnected: false
+};
+
+// ============================================================
+// DATABASE STATUS CHECK
+// ============================================================
+async function checkDbStatus() {
+  const el    = document.getElementById('db-status');
+  const label = document.getElementById('db-status-text');
+  try {
+    const res  = await fetch(`${API_BASE}/get_leaderboard.php`, { signal: AbortSignal.timeout(4000) });
+    const data = await res.json();
+    if (data.success) {
+      el.className    = 'db-status ok';
+      label.textContent = `MySQL connected · ${data.total} record${data.total !== 1 ? 's' : ''} stored`;
+      S.dbConnected   = true;
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch (e) {
+    el.className    = 'db-status err';
+    label.textContent = 'Database offline — check XAMPP';
+    S.dbConnected   = false;
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-quiz') loadAndRenderLB();
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function startQuiz() {
+  const nick = document.getElementById('nickname-input').value.trim();
+  const err  = document.getElementById('login-error');
+  if (!nick)           { err.textContent = 'Callsign cannot be empty'; return; }
+  if (nick.length < 2) { err.textContent = 'Minimum 2 characters required'; return; }
+  err.textContent = '';
+  S.nickname = nick.toUpperCase();
+  initQuiz();
+}
+
+function initQuiz() {
+  const pool = Array.from({ length: 20 }, (_, i) => i);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  S.selected = pool.slice(0, 5);
+  S.current = 0; S.score = 0; S.elapsedSeconds = 0;
+  goTo('screen-quiz');
+  startStopwatch();
+  renderQuestion();
+}
+
+function retakeQuiz() { goTo('screen-login'); }
+
+// ============================================================
+// STOPWATCH
+// ============================================================
+function startStopwatch() {
+  S.elapsedSeconds = 0;
+  updateStopwatchDisplay();
+  if (S.stopwatchInterval) clearInterval(S.stopwatchInterval);
+  S.stopwatchInterval = setInterval(() => {
+    S.elapsedSeconds++;
+    updateStopwatchDisplay();
+  }, 1000);
+}
+function stopStopwatch() {
+  clearInterval(S.stopwatchInterval);
+  S.stopwatchInterval = null;
+}
+function updateStopwatchDisplay() {
+  const m = Math.floor(S.elapsedSeconds / 60);
+  const s = S.elapsedSeconds % 60;
+  document.getElementById('stopwatch-display').textContent =
+    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+// ============================================================
+// QUESTION RENDER
+// ============================================================
+function renderQuestion() {
+  const qi = S.selected[S.current];
+  const q  = QB[qi];
+  S.answered = false;
+
+  document.getElementById('q-nickname').textContent = S.nickname;
+  document.getElementById('q-score').textContent    = S.score;
+  document.getElementById('q-num').textContent      = `Q.${String(qi + 1).padStart(3, '0')}`;
+  document.getElementById('q-text').textContent     = q.q;
+
+  const codeEl = document.getElementById('q-code');
+  if (q.code) { codeEl.style.display = 'block'; codeEl.innerHTML = syntaxHL(q.code); }
+  else        { codeEl.style.display = 'none'; }
+
+  const pct = Math.round((S.current / 5) * 100);
+  document.getElementById('progress-label').textContent = `Question ${S.current + 1} of 5`;
+  document.getElementById('progress-pct').textContent   = pct + '%';
+  document.getElementById('progress-bar').style.width   = pct + '%';
+
+  const wrap = document.getElementById('choices-wrap');
+  wrap.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.innerHTML = `<span class="choice-key">${KEYS[i]}</span>${escHtml(c)}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    wrap.appendChild(btn);
+  });
+
+  document.getElementById('next-wrap').style.display = 'none';
+  document.getElementById('next-btn').textContent =
+    S.current < 4 ? 'Next Question →' : 'View Results →';
+}
+
+// ============================================================
+// ANSWER — no correct/wrong reveal
+// ============================================================
+function selectAnswer(idx, btnEl) {
+  if (S.answered) return;
+  S.answered = true;
+  document.querySelectorAll('.choice').forEach(b => b.disabled = true);
+  btnEl.classList.add('selected');
+  if (idx === QB[S.selected[S.current]].ans) S.score++;
+  document.getElementById('q-score').textContent = S.score;
+  document.getElementById('next-wrap').style.display = 'block';
+}
+
+function nextQuestion() {
+  S.current++;
+  if (S.current >= 5) finishQuiz();
+  else renderQuestion();
+}
+
+// ============================================================
+// FINISH — save to MySQL then show results
+// ============================================================
+async function finishQuiz() {
+  stopStopwatch();
+  const totalSec = S.elapsedSeconds;
+
+  // Show saving overlay
+  document.getElementById('saving-overlay').classList.add('show');
+
+  let rank = null;
+  let savedToDb = false;
+
+  try {
+    const res = await fetch(`${API_BASE}/save_result.php`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nickname:   S.nickname,
+        score:      S.score,
+        time_taken: totalSec
+      }),
+      signal: AbortSignal.timeout(6000)
+    });
+    const data = await res.json();
+    if (data.success) {
+      rank      = data.rank;
+      savedToDb = true;
+    }
+  } catch (e) {
+    console.error('Save failed:', e);
+    // Quiz still works — just won't show DB-saved badge
+  }
+
+  // Hide overlay
+  document.getElementById('saving-overlay').classList.remove('show');
+
+  // Show results
+  const grades = ['Critical Fail','Needs Improvement','Average','Good','Excellent','Perfect Score'];
+  document.getElementById('res-score').textContent   = `${S.score}/5`;
+  document.getElementById('res-grade').textContent   = `GRADE: ${grades[S.score]}`;
+  document.getElementById('res-correct').textContent = S.score;
+  document.getElementById('res-wrong').textContent   = 5 - S.score;
+  document.getElementById('res-time').textContent    = fmtTime(totalSec);
+  document.getElementById('res-rank').textContent    = rank && rank <= 10 ? `#${rank}` : rank ? `#${rank}` : '—';
+
+  const badge = document.getElementById('db-saved-badge');
+  badge.style.display = savedToDb ? 'flex' : 'none';
+
+  goTo('screen-results');
+
+  // Refresh db status pill
+  checkDbStatus();
+}
+
+// ============================================================
+// LEADERBOARD — fetched from MySQL
+// ============================================================
+async function loadAndRenderLB() {
+  const statusEl = document.getElementById('lb-status');
+  const bodyEl   = document.getElementById('lb-body');
+  const totalEl  = document.getElementById('lb-total');
+
+  statusEl.textContent = 'Fetching from database...';
+  bodyEl.innerHTML     = '<div class="lb-empty">Loading...</div>';
+  totalEl.textContent  = '';
+
+  try {
+    const res  = await fetch(`${API_BASE}/get_leaderboard.php?limit=10`, {
+      signal: AbortSignal.timeout(5000)
+    });
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error);
+
+    statusEl.textContent = `MySQL · Updated just now`;
+    totalEl.textContent  = `${data.total} total attempt${data.total !== 1 ? 's' : ''} in DB`;
+
+    const entries = data.entries;
+    if (!entries.length) {
+      bodyEl.innerHTML = '<div class="lb-empty">No entries yet.<br>Be first on the board!</div>';
+      return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    bodyEl.innerHTML = entries.map((e, i) => {
+      const barW     = Math.round((e.score / 5) * 100);
+      const rankCls  = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+      const rankLabel = i < 3 ? medals[i] : e.rank;
+      // Format date nicely
+      const d = new Date(e.date_taken);
+      const dateStr = isNaN(d) ? e.date_taken : d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="lb-entry">
+        <div class="lb-rank ${rankCls}">${rankLabel}</div>
+        <div class="lb-info">
+          <div class="lb-name">${escHtml(e.nickname)}</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barW}%"></div></div>
+          <div class="lb-time">${fmtTime(e.time_taken)} · ${dateStr}</div>
+        </div>
+        <div class="lb-score">${e.score}/5</div>
+      </div>`;
+    }).join('');
+
+  } catch (err) {
+    statusEl.textContent = 'Database offline';
+    bodyEl.innerHTML = `<div class="lb-empty">Could not reach database.<br>Make sure XAMPP is running.</div>`;
+  }
+}
+
+// ============================================================
+// SYNTAX HIGHLIGHT
+// ============================================================
+function syntaxHL(code) {
+  const kwRe = /\b(int|float|bool|char|void|const|return|if|else|while|for|true|false|unsigned|long|String|static)\b/g;
+  const fnRe = /\b(digitalWrite|digitalRead|analogRead|analogWrite|pinMode|Serial|delay|millis|map|random|randomSeed|toupper|strlen|println|begin)\b/g;
+  const numRe = /\b(\d+)\b/g;
+  const cmRe  = /(\/\/[^\n]*)/g;
+  let out = escHtml(code);
+  const comments = [];
+  out = out.replace(cmRe, m => { comments.push(m); return `%%CM${comments.length - 1}%%`; });
+  out = out.replace(kwRe, m => `<span class="kw">${m}</span>`);
+  out = out.replace(fnRe, m => `<span class="fn">${m}</span>`);
+  out = out.replace(numRe, m => `<span class="num">${m}</span>`);
+  out = out.replace(/%%CM(\d+)%%/g, (_, i) => `<span class="cm">${comments[i]}</span>`);
+  return out;
+}
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ──────────────────────────────────────────────────────
+checkDbStatus();
+</script>
+</body>
+</html>
