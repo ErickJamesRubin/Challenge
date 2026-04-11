@@ -151,9 +151,23 @@ body::before {
 .input-err{color:var(--red);font-size:0.78rem;margin-bottom:12px;font-family:'JetBrains Mono',monospace;min-height:20px;}
 
 /* ─── SPLASH ─── */
-#screen-splash{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;}
-#screen-splash.active{display:flex;}
-.splash-info{ display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 28px;justify-content:center; }
+#screen-splash{display:none;}
+#screen-splash.active{display:block;}
+
+.splash-grid {
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:24px;
+  align-items:start;
+  width:100%;
+}
+@media(max-width:820px){
+  .splash-grid{grid-template-columns:1fr;}
+}
+
+.splash-left{display:flex;flex-direction:column;gap:16px;}
+
+.splash-info{ display:flex;gap:12px;flex-wrap:wrap; }
 .splash-chip{
   background:var(--accent-l);color:var(--accent);border:1px solid rgba(58,125,68,0.25);
   font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;
@@ -162,11 +176,52 @@ body::before {
 .splash-ascii{
   font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--ink3);
   background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);
-  padding:22px 28px;line-height:2;margin-bottom:28px;width:100%;max-width:460px;
+  padding:22px 28px;line-height:2;width:100%;
 }
 .splash-ascii .kw{color:var(--accent);font-weight:700;}
 .splash-ascii .cm{color:var(--ink3);}
 .splash-ascii .num{color:var(--amber);}
+
+/* ─── SPLASH LEADERBOARD ─── */
+.splash-lb-card {
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px 22px 18px;box-shadow:var(--shadow);
+  position:sticky;top:20px;
+}
+.splash-lb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.splash-lb-tag{
+  background:var(--accent-l);color:var(--accent);
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:700;
+  padding:3px 10px;border-radius:20px;border:1px solid rgba(58,125,68,0.2);
+}
+.splash-lb-hint{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--ink3);margin-bottom:10px;
+}
+.splash-you-row{
+  margin-top:10px;padding:10px 12px;border-radius:8px;
+  background:var(--accent-xl);border:1px solid rgba(58,125,68,0.25);
+  display:flex;align-items:center;gap:10px;
+}
+.splash-you-rank{
+  font-family:'Space Mono',monospace;font-weight:700;font-size:0.75rem;
+  color:var(--accent);width:28px;text-align:center;flex-shrink:0;
+}
+.splash-you-info{flex:1;}
+.splash-you-name{
+  font-family:'JetBrains Mono',monospace;font-size:0.8rem;font-weight:700;color:var(--accent);
+}
+.splash-you-tag{
+  font-size:0.55rem;background:var(--accent);color:#fff;
+  padding:2px 6px;border-radius:4px;margin-left:5px;
+  font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:1px;vertical-align:middle;
+}
+.splash-you-sub{font-size:0.6rem;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.splash-you-score{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.splash-lb-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:12px;padding-top:10px;border-top:1px solid var(--border);
+}
+.splash-lb-footer-note{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--ink3);}
 
 /* ─── QUIZ LAYOUT ─── */
 .quiz-layout{ display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start; }
@@ -325,7 +380,11 @@ body::before {
 
   <!-- ═══ SPLASH ═══ -->
   <div class="screen active" id="screen-splash">
-    <div class="splash-ascii">
+    <div class="splash-grid">
+
+      <!-- Left: ASCII + chips + button -->
+      <div class="splash-left">
+        <div class="splash-ascii">
 <span class="cm">// Arduino Quiz Engine v3.0 + MySQL</span>
 <span class="kw">void</span> <span style="color:#3a7d44">setup</span>() {
   db.connect(<span style="color:#f4d67a">"bsit_quiz"</span>);
@@ -337,15 +396,50 @@ body::before {
     quiz.start(); <span class="cm">// records saved</span>
   }
 }
-    </div>
-    <div class="splash-info">
-      <div class="splash-chip">20 Questions</div>
-      <div class="splash-chip">5 Per Attempt</div>
-      <div class="splash-chip">Timed Overall</div>
-      <div class="splash-chip">MySQL Database</div>
-    </div>
-    <div style="width:100%;max-width:420px;">
-      <button class="btn" onclick="goTo('screen-login')">Start Quiz →</button>
+        </div>
+        <div class="splash-info">
+          <div class="splash-chip">20 Questions</div>
+          <div class="splash-chip">5 Per Attempt</div>
+          <div class="splash-chip">Timed Overall</div>
+          <div class="splash-chip">MySQL Database</div>
+        </div>
+        <button class="btn" onclick="goTo('screen-login')">Start Quiz →</button>
+      </div>
+
+      <!-- Right: Live Leaderboard Preview -->
+      <div class="splash-lb-card">
+        <div class="splash-lb-head">
+          <div class="label" style="margin-bottom:0;">Live Leaderboard</div>
+          <span class="splash-lb-tag">Top 10</span>
+        </div>
+        <div class="splash-lb-hint">Ranked by score → fastest time wins ties</div>
+
+        <div class="lb-status" id="splash-lb-status">Loading from database...</div>
+        <div id="splash-lb-body"><div class="lb-empty">Loading...</div></div>
+        <div class="lb-total" id="splash-lb-total"></div>
+
+        <!-- YOU placeholder -->
+        <div class="splash-you-row">
+          <div class="splash-you-rank">?</div>
+          <div class="splash-you-info">
+            <div class="splash-you-name">
+              YOU
+              <span class="splash-you-tag">NEXT</span>
+            </div>
+            <div class="splash-you-sub">Your score goes here after you play</div>
+          </div>
+          <div class="splash-you-score">?/5</div>
+        </div>
+
+        <div class="splash-lb-footer">
+          <div class="db-status" id="splash-db-pill" style="margin-top:0;">
+            <span class="dot"></span>
+            <span id="splash-db-pill-text">Checking...</span>
+          </div>
+          <div class="splash-lb-footer-note">Score → Speed</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -501,18 +595,22 @@ let S = {
 async function checkDbStatus() {
   const el    = document.getElementById('db-status');
   const label = document.getElementById('db-status-text');
+  const pill  = document.getElementById('splash-db-pill');
+  const pillT = document.getElementById('splash-db-pill-text');
   try {
     const res  = await fetch(`${API_BASE}/get_leaderboard.php`, { signal: AbortSignal.timeout(4000) });
     const data = await res.json();
     if (data.success) {
       el.className      = 'db-status ok';
       label.textContent = `MySQL connected · ${data.total} record${data.total !== 1 ? 's' : ''} stored`;
-      S.dbConnected     = true;
+      if (pill) { pill.className = 'db-status ok'; pillT.textContent = `MySQL · ${data.total} record${data.total !== 1 ? 's' : ''}`; }
+      S.dbConnected = true;
     } else { throw new Error(data.error || 'Unknown error'); }
   } catch (e) {
     el.className      = 'db-status err';
     label.textContent = 'Database offline — check XAMPP';
-    S.dbConnected     = false;
+    if (pill) { pill.className = 'db-status err'; pillT.textContent = 'Database offline'; }
+    S.dbConnected = false;
   }
 }
 
@@ -520,7 +618,57 @@ function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
-  if (id === 'screen-quiz') loadAndRenderLB();
+  if (id === 'screen-quiz')   loadAndRenderLB();
+  if (id === 'screen-splash') loadSplashLB();
+}
+
+async function loadSplashLB() {
+  const statusEl = document.getElementById('splash-lb-status');
+  const bodyEl   = document.getElementById('splash-lb-body');
+  const totalEl  = document.getElementById('splash-lb-total');
+  if (!statusEl) return;
+
+  statusEl.textContent = 'Fetching from database...';
+  bodyEl.innerHTML     = '<div class="lb-empty">Loading...</div>';
+  totalEl.textContent  = '';
+
+  try {
+    const res  = await fetch(`${API_BASE}/get_leaderboard.php?limit=7`, { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    statusEl.textContent = `MySQL · Updated just now`;
+    totalEl.textContent  = `${data.total} total attempt${data.total !== 1 ? 's' : ''} in DB`;
+
+    const entries = data.entries;
+    if (!entries.length) {
+      bodyEl.innerHTML = '<div class="lb-empty">No entries yet.<br>Be the first on the board!</div>';
+      return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    bodyEl.innerHTML = entries.map((e, i) => {
+      const barW     = Math.round((e.score / 5) * 100);
+      const rankCls  = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+      const rankLabel = i < 3 ? medals[i] : e.rank;
+      const d = new Date(e.date_taken);
+      const dateStr = isNaN(d) ? e.date_taken
+        : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `<div class="lb-entry">
+        <div class="lb-rank ${rankCls}">${rankLabel}</div>
+        <div class="lb-info">
+          <div class="lb-name">${escHtml(e.nickname)}</div>
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barW}%"></div></div>
+          <div class="lb-time">${fmtTime(e.time_taken)} · ${dateStr}</div>
+        </div>
+        <div class="lb-score">${e.score}/5</div>
+      </div>`;
+    }).join('');
+
+  } catch (err) {
+    statusEl.textContent = 'Database offline';
+    bodyEl.innerHTML = `<div class="lb-empty">Start XAMPP to load<br>the leaderboard.</div>`;
+  }
 }
 
 function startQuiz() {
@@ -566,7 +714,7 @@ function renderQuestion() {
   const qi = S.selected[S.current];
   const q  = QB[qi];
   S.answered      = false;
-  S.pendingAnswer = undefined;  // ← reset pending answer each question
+  S.pendingAnswer = undefined;
 
   document.getElementById('q-nickname').textContent = S.nickname;
   document.getElementById('q-score').textContent    = S.score;
@@ -597,19 +745,15 @@ function renderQuestion() {
     S.current < 4 ? 'Next Question →' : 'View Results →';
 }
 
-// ── ANSWER: allows reselection until Next is clicked ──
 function selectAnswer(idx, btnEl) {
   if (S.answered) return;
-  // Deselect all, then select clicked
   document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
   btnEl.classList.add('selected');
   S.pendingAnswer = idx;
-  // Show next button but don't lock in yet
   document.getElementById('next-wrap').style.display = 'block';
 }
 
 function nextQuestion() {
-  // Lock in the answer when Next is clicked
   if (!S.answered && S.pendingAnswer !== undefined) {
     S.answered = true;
     document.querySelectorAll('.choice').forEach(b => b.disabled = true);
@@ -726,6 +870,7 @@ function escHtml(s) {
 }
 
 checkDbStatus();
+loadSplashLB();
 </script>
 </body>
 </html>
